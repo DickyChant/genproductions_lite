@@ -1,8 +1,5 @@
-# genproductions
-Generator fragments for MC production
+# IMPORTANT
 
-The package includes the datacards used for various generators inclusing POWHEG, MG5_aMC@NLO, Sherpa, Phantom, Pythia...
+This is not the full version genproductions setup, only a lite version removing unnecessary files to facilitate the CMS DAS in 2024 (link)[https://sihyunjeon.github.io/generators-cmsdaslpc2024/index.html].
 
-Further details are reported in the twiki: https://twiki.cern.ch/twiki/bin/view/CMS/GeneratorMain#How_to_produce_gridpacks
-
-Instructions on how to use the fragments are here https://twiki.cern.ch/twiki/bin/view/CMS/GitRepositoryForGenProduction
+For up-to-date and CMS official usages, please use (link)[https://github.com/cms-sw/genproductions].
