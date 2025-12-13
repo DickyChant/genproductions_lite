@@ -47,7 +47,10 @@ class GridpackConfig:
             elif 'release 9' in system_release:
                 self.scram_arch = 'el9_amd64_gcc11'
             else:
-                raise ValueError("No default scram_arch for current OS!")
+                # Default for non-RedHat systems or when file is not available
+                self.scram_arch = 'slc7_amd64_gcc10'
+                if not system_release:
+                    print("Warning: Using default scram_arch (slc7_amd64_gcc10)")
         
         if self.cmssw_version is None:
             if 'release 7' in system_release:
@@ -57,7 +60,10 @@ class GridpackConfig:
             elif 'release 9' in system_release:
                 self.cmssw_version = 'CMSSW_13_2_9'
             else:
-                raise ValueError("No default CMSSW for current OS!")
+                # Default for non-RedHat systems or when file is not available
+                self.cmssw_version = 'CMSSW_12_4_8'
+                if not system_release:
+                    print("Warning: Using default CMSSW version (CMSSW_12_4_8)")
     
     @property
     def cardsdir(self) -> str:
