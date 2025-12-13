@@ -1,6 +1,7 @@
 """Utility functions for gridpack generation."""
 
 import os
+import shutil
 import subprocess
 import sys
 from typing import Optional
@@ -92,6 +93,3 @@ def check_lxplus_eos():
         print("WARNING: Running in /eos/home-X/ which is not really stable.")
         print("Use /eos/user/X/ instead.")
         sys.exit(1)
-
-
-import shutil

@@ -146,10 +146,11 @@ class TestCardValidator(unittest.TestCase):
         with open(run_card, 'w') as f:
             f.write("# Run card\n")
         
-        # Create madspin card with typo
+        # Create madspin card with typo (intentional: 'weigth' instead of 'weight')
+        # This tests the validator's ability to catch the known MG typo
         madspin_card = os.path.join(self.cards_dir, "test_process_madspin_card.dat")
         with open(madspin_card, 'w') as f:
-            f.write("Nevents_for_max_weigth 100\n")
+            f.write("Nevents_for_max_weigth 100\n")  # Intentional typo
         
         self.assertFalse(self.validator.validate_all())
 
