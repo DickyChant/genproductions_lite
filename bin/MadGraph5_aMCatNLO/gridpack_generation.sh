@@ -1,6 +1,14 @@
 #!/bin/bash
 
 ##########################################################################################
+# NOTE: A Python-based refactored version is now available!                             #
+# See gridpack_generation.py and README_GRIDPACK_GENERATION.md for the new              #
+# modular, maintainable implementation.                                                  #
+#                                                                                        #
+# This bash script is kept for reference and backward compatibility.                    #
+##########################################################################################
+
+##########################################################################################
 #GENERAL INSTRUCTIONS:                                                                   #
 #You should take care of having the following ingredients in order to have this recipe   #
 #working: run card and proc card (in a "cards" folder), MadGraph release, this script    #
