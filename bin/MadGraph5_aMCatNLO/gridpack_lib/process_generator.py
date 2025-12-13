@@ -116,12 +116,17 @@ class ProcessGenerator:
                     if line.strip().startswith('#'):
                         continue
                     if 'istr' in line and '=' in line:
-                        istr_value = int(line.split('=')[0].strip())
-                        if 1 <= istr_value <= 6:
-                            return True
-                        elif istr_value != 0:
-                            print("istr should be between 1 and 6")
-                            return False
+                        # Extract value from right side of '='
+                        try:
+                            istr_value = int(line.split('=')[1].split()[0].strip())
+                            if 1 <= istr_value <= 6:
+                                return True
+                            elif istr_value != 0:
+                                print("istr should be between 1 and 6")
+                                return False
+                        except (ValueError, IndexError):
+                            # Invalid format, skip
+                            continue
         except Exception:
             pass
         
@@ -261,10 +266,17 @@ class ProcessGenerator:
         
         if os.path.exists(helpers_file):
             # Source helpers and call prepare_run_card
-            cmd = f"""
-            source {helpers_file}
-            prepare_run_card {self.config.name} {self.config.cardsdir} {self.is5flavor_scheme} {script_dir} {1 if self.is_nlo else 0}
-            """
+            # Use shlex.quote to prevent command injection
+            import shlex
+            
+            cmd = (
+                f"source {shlex.quote(helpers_file)} && "
+                f"prepare_run_card {shlex.quote(self.config.name)} "
+                f"{shlex.quote(self.config.cardsdir)} "
+                f"{self.is5flavor_scheme} "
+                f"{shlex.quote(script_dir)} "
+                f"{1 if self.is_nlo else 0}"
+            )
             
             try:
                 subprocess.run(

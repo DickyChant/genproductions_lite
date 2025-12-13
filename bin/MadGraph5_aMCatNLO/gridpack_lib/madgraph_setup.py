@@ -148,10 +148,13 @@ class MadGraphSetup:
                 return False
         
         # Apply custom user patches if present
-        user_patches = sorted([
-            f for f in os.listdir(self.config.cardsdir)
-            if f.startswith(self.config.name) and f.endswith('.patch')
-        ])
+        if os.path.exists(self.config.cardsdir):
+            user_patches = sorted([
+                f for f in os.listdir(self.config.cardsdir)
+                if f.startswith(self.config.name) and f.endswith('.patch')
+            ])
+        else:
+            user_patches = []
         
         for patch_file in user_patches:
             patch_path = os.path.join(self.config.cardsdir, patch_file)
