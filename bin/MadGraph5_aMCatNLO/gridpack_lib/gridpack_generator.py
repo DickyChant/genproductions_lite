@@ -3,6 +3,7 @@
 import os
 import sys
 import shutil
+import subprocess
 from pathlib import Path
 
 from .config import GridpackConfig
@@ -660,6 +661,3 @@ class GridpackGenerator:
                         os.remove(tarball_name)
                     
                     break
-
-
-import subprocess
