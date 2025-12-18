@@ -247,7 +247,7 @@ def tunes_settings_check(dn, fragment, pi, sherpa_flag):
         if ("Configuration.Generator.MCTunesRun3ECM13p6TeV" not in fragment) and ("Configuration.Generator.Herwig7Settings.Herwig7CH3TuneSettings_cfi" not in fragment) or ("from Configuration.Generator.MCTunes2017" in fragment):
             error_tunes_check.append(" For Run3 samples, please use either:\n from Configuration.Generator.MCTunesRun3ECM13p6TeV.PythiaCP5Settings_cfi import * \n from Configuration.Generator.Herwig7Settings.Herwig7CH3TuneSettings_cfi import * \n in your fragment instead of: from Configuration.Generator.MCTunes2017.PythiaCP5Settings_cfi import *")
     if "Run3" in pi and (dn.startswith("DYto") or dn.startswith("Wto")):
-        if "ktdard" in fragment and "0.248" not in fragment:
+        if "kthard" in fragment and "0.248" not in fragment:
             error_tunes_check.append(" 'kthard = 0.248' not in fragment for DY or Wjets MG5_aMC request for Run3. Please fix.")
     return error_tunes_check
  
@@ -324,7 +324,18 @@ def concurrency_check(fragment, pi, cmssw_version, mg_gp):
             error_conc.append("Concurrent generation is not supported for versions < CMSSW_10_6_28 and CMSSW_11_X_X series")
     return conc_check_lhe and conc_check, error_conc
    
-def ul_consistency(dn,pi,jhu_gp):
+def ul_consistency(dn, pi, jhu_gp):
+    """
+    Check UltraLegacy consistency between related requests.
+    
+    Args:
+        dn (str): Dataset name
+        pi (str): Prepid
+        jhu_gp (bool): Whether this is JHUGen gridpack
+        
+    Returns:
+        tuple: (list of warnings, list of errors)
+    """
     pi_prime = "NULL"
     prime_tmp = []
     warning_ul = []
@@ -517,7 +528,17 @@ def run3_checks(fragment, dn, pi):
         err.append("The data set name does not contain 14TeV for this Run3 request")
     return err
 
-def run3_run_card_check(filename_mggpc,pi):
+def run3_run_card_check(filename_mggpc, pi):
+    """
+    Check beam energy in run_card for Run3 MG5_aMC samples.
+    
+    Args:
+        filename_mggpc (str): Path to run_card
+        pi (str): Prepid
+        
+    Returns:
+        list: List of error messages
+    """
     err = []
     beamenergy1 = os.popen('grep ebeam1 '+filename_mggpc).read()
     beamenergy2 = os.popen('grep ebeam2 '+filename_mggpc).read()
@@ -529,7 +550,17 @@ def run3_run_card_check(filename_mggpc,pi):
         err.append("The beam energy is not specified as 7000 GeV in the run_card")
     return err 
 
-def exception_for_ul_check(datatobereplaced,cross_section_fragment):
+def exception_for_ul_check(datatobereplaced, cross_section_fragment):
+    """
+    Apply exceptions for UltraLegacy consistency check.
+    
+    Args:
+        datatobereplaced (str): Fragment data to process
+        cross_section_fragment: Cross section value from fragment
+        
+    Returns:
+        str: Modified data with exceptions applied
+    """
     new_data = datatobereplaced.replace(" ","")
     new_data = new_data.replace(",generateConcurrently=cms.untracked.bool(True)","")
     new_data = new_data.replace("Concurrent","")
@@ -551,7 +582,20 @@ def exception_for_ul_check(datatobereplaced,cross_section_fragment):
         new_data = new_data.replace('crossSection=cms.untracked.double(-1)','')
     return new_data
 
-def vbf_dipole_recoil_check(vbf_lo,vbf_nlo,data_f2,pw_gp,dn):
+def vbf_dipole_recoil_check(vbf_lo, vbf_nlo, data_f2, pw_gp, dn):
+    """
+    Check VBF dipole recoil settings.
+    
+    Args:
+        vbf_lo (bool): Whether this is VBF LO
+        vbf_nlo (bool): Whether this is VBF NLO
+        data_f2 (str): Fragment content
+        pw_gp (bool): Whether this is Powheg gridpack
+        dn (str): Dataset name
+        
+    Returns:
+        tuple: (list of warnings, list of errors)
+    """
     dipole_recoil_flag = 0
     dipole_recoil = re.findall('SpaceShower:dipoleRecoil.*?\S+\S+',data_f2)
     warning_dipole = []
