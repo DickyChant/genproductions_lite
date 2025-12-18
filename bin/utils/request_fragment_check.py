@@ -4,12 +4,12 @@ Request Fragment Checker for CMS McM
 
 This script validates McM requests for fragment configuration, gridpacks,
 and other generator parameters. It performs comprehensive checks for:
-- Generator parameters (cross-section, filter efficiency, etc.)
-- Gridpack validation (MadGraph, Powheg, JHUGen, Sherpa)
-- Tune and PDF settings
-- Concurrency settings for multi-threaded generation
-- UltraLegacy (UL) consistency between related requests
-- Run3 specific checks
+  - Generator parameters (cross-section, filter efficiency, etc.)
+  - Gridpack validation (MadGraph, Powheg, JHUGen, Sherpa)
+  - Tune and PDF settings
+  - Concurrency settings for multi-threaded generation
+  - UltraLegacy (UL) consistency between related requests
+  - Run3 specific checks
 
 Usage:
     python request_fragment_check.py --prepid <PREPID> [options]
@@ -156,7 +156,7 @@ def get_requests_from_datasetname(dn):
 # FILE AND DIRECTORY UTILITIES
 # ============================================================================
 
-def find_file(dir_path,patt):
+def find_file(dir_path, patt):
     """
     Find a file by pattern in directory tree.
     
@@ -198,7 +198,7 @@ def check_replace(runcmsgridfile):
 # GRIDPACK HANDLING FUNCTIONS
 # ============================================================================
 
-def slha_gp(gridpack_cvmfs_path,slha_flag):
+def slha_gp(gridpack_cvmfs_path, slha_flag):
     """
     Handle SLHA gridpack path processing.
     
@@ -229,7 +229,7 @@ def slha_gp(gridpack_cvmfs_path,slha_flag):
     return gridpack_cvmfs_path, slha_all_path, slha_flag
 
 
-def tunes_settings_check(dn,fragment,pi,sherpa_flag):
+def tunes_settings_check(dn, fragment, pi, sherpa_flag):
     """
     Check tune settings for Run3 samples.
     
@@ -251,7 +251,7 @@ def tunes_settings_check(dn,fragment,pi,sherpa_flag):
             error_tunes_check.append(" 'kthard = 0.248' not in fragment for DY or Wjets MG5_aMC request for Run3. Please fix.")
     return error_tunes_check
  
-def concurrency_check(fragment,pi,cmssw_version,mg_gp):
+def concurrency_check(fragment, pi, cmssw_version, mg_gp):
     """
     Check concurrency settings for multi-threaded generation.
     
@@ -484,7 +484,7 @@ def evtgen_check(fragment):
         warn.append("Are you sure you do not want the 2014 decay dec table?")
     return warn, err
 
-def run3_checks(fragment,dn,pi):
+def run3_checks(fragment, dn, pi):
     """
     Perform Run3 specific checks.
     
