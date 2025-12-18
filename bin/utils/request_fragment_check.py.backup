@@ -1,23 +1,4 @@
 #!/bin/env python3
-"""
-Request Fragment Checker for CMS McM
-
-This script validates McM requests for fragment configuration, gridpacks,
-and other generator parameters. It performs comprehensive checks for:
-- Generator parameters (cross-section, filter efficiency, etc.)
-- Gridpack validation (MadGraph, Powheg, JHUGen, Sherpa)
-- Tune and PDF settings
-- Concurrency settings for multi-threaded generation
-- UltraLegacy (UL) consistency between related requests
-- Run3 specific checks
-
-Usage:
-    python request_fragment_check.py --prepid <PREPID> [options]
-    python request_fragment_check.py --ticket <TICKET> [options]
-
-Author: CMS Generator Group
-"""
-
 import os
 import sys
 import re
@@ -75,21 +56,7 @@ mcm = McM(id=None, dev=args.dev, debug=args.debug)
 mcm_link = mcm.server
 
 
-
-# ============================================================================
-# MCM API FUNCTIONS
-# ============================================================================
-
 def get_request(prepid):
-    """
-    Retrieve a single McM request by prepid.
-    
-    Args:
-        prepid (str): Request prepid
-        
-    Returns:
-        dict: Request data or empty dict if not found
-    """
     result = mcm._McM__get('public/restapi/requests/get/%s' % (prepid))
     if not result:
         return {}
@@ -99,15 +66,6 @@ def get_request(prepid):
 
 
 def get_range_of_requests(query):
-    """
-    Retrieve multiple McM requests using a query.
-    
-    Args:
-        query (str): Query string for requests
-        
-    Returns:
-        dict: Results or empty dict if not found
-    """
     result = mcm._McM__put('public/restapi/requests/listwithfile', data={'contents': query})
     if not result:
         return {}
@@ -117,15 +75,6 @@ def get_range_of_requests(query):
 
 
 def get_ticket(prepid):
-    """
-    Retrieve a McM ticket by prepid.
-    
-    Args:
-        prepid (str): Ticket prepid
-        
-    Returns:
-        dict: Ticket data or empty dict if not found
-    """
     result = mcm._McM__get('public/restapi/mccms/get/%s' % (prepid))
     if not result:
         return {}
@@ -133,17 +82,7 @@ def get_ticket(prepid):
     result = result.get('results', {})
     return result
 
-
 def get_requests_from_datasetname(dn):
-    """
-    Retrieve requests from dataset name.
-    
-    Args:
-        dn (str): Dataset name
-        
-    Returns:
-        list: List of matching requests
-    """
     raw_result = mcm._McM__get(
         "public/restapi/requests/from_dataset_name/%s" % (dn)
     )
@@ -151,64 +90,20 @@ def get_requests_from_datasetname(dn):
         return []
     return raw_result.get("results", [])
 
-
-# ============================================================================
-# FILE AND DIRECTORY UTILITIES
-# ============================================================================
-
 def find_file(dir_path,patt):
-    """
-    Find a file by pattern in directory tree.
-    
-    Args:
-        dir_path (str): Directory to search
-        patt (str): File pattern to match
-        
-    Returns:
-        str: Path to found file or None
-    """
     for root, dirs, files in os.walk(dir_path):
         for file in files:
             if file.endswith(patt):
                 return root+'/'+str(file)
 
-
-# ============================================================================
-# FRAGMENT VALIDATION FUNCTIONS
-# ============================================================================
-
 def check_replace(runcmsgridfile):
-    """
-    Check for incomplete gridpack with _REPLACE strings.
-    
-    Args:
-        runcmsgridfile (str): Path to runcmsgrid.sh file
-        
-    Returns:
-        list: List of error messages
-    """
     error_check_replace = []
     replace_mccont = os.popen('grep "_REPLACE" '+str(runcmsgridfile)).read()
     if len(replace_mccont):
         error_check_replace.append(" Incomplete gridpack. Replace _REPLACE strings in runcmsgrid.sh:")
     return error_check_replace 
 
-
-# ============================================================================
-# GRIDPACK HANDLING FUNCTIONS
-# ============================================================================
-
 def slha_gp(gridpack_cvmfs_path,slha_flag):
-    """
-    Handle SLHA gridpack path processing.
-    
-    Args:
-        gridpack_cvmfs_path (str): CVMFS gridpack path
-        slha_flag (int): SLHA flag status
-        
-    Returns:
-        tuple: (updated_cvmfs_path, slha_all_path, updated_slha_flag)
-    """
     slha_all_path = os.path.dirname(gridpack_eos_path)
     if slha_flag == 1:
         if "%i" in gridpack_cvmfs_path:
@@ -230,18 +125,6 @@ def slha_gp(gridpack_cvmfs_path,slha_flag):
 
 
 def tunes_settings_check(dn,fragment,pi,sherpa_flag):
-    """
-    Check tune settings for Run3 samples.
-    
-    Args:
-        dn (str): Dataset name
-        fragment (str): Fragment content
-        pi (str): Prepid
-        sherpa_flag (bool): Whether this is a Sherpa sample
-        
-    Returns:
-        list: List of error messages
-    """
     error_tunes_check = []
     if "Run3" in pi and "FlatRandomEGunProducer" not in fragment and "FlatRandomPtGunProducer" not in fragment and "Pythia8EGun" not in fragment and "Pythia8PtGun" not in fragment and "FlatRandomPtAndDxyGunProducer" not in fragment and sherpa_flag == 0:
         if ("Configuration.Generator.MCTunesRun3ECM13p6TeV" not in fragment) and ("Configuration.Generator.Herwig7Settings.Herwig7CH3TuneSettings_cfi" not in fragment) or ("from Configuration.Generator.MCTunes2017" in fragment):
@@ -252,18 +135,6 @@ def tunes_settings_check(dn,fragment,pi,sherpa_flag):
     return error_tunes_check
  
 def concurrency_check(fragment,pi,cmssw_version,mg_gp):
-    """
-    Check concurrency settings for multi-threaded generation.
-    
-    Args:
-        fragment (str): Fragment content
-        pi (str): Prepid
-        cmssw_version (int): CMSSW version number
-        mg_gp (bool): Whether this is a MadGraph gridpack
-        
-    Returns:
-        tuple: (is_concurrent, list of error messages)
-    """
     conc_check = 0
     conc_check_lhe = 0
     error_conc = []
@@ -457,15 +328,6 @@ def xml_check_and_patch(f,cont,gridpack_eos_path,my_path,pi):
     return warning_xml,error_xml
 
 def evtgen_check(fragment):
-    """
-    Check EvtGen configuration in fragment.
-    
-    Args:
-        fragment (str): Fragment content
-        
-    Returns:
-        tuple: (list of warnings, list of errors)
-    """
     err = []
     warn = []
     fragment = fragment.replace(" ","")
@@ -485,17 +347,6 @@ def evtgen_check(fragment):
     return warn, err
 
 def run3_checks(fragment,dn,pi):
-    """
-    Perform Run3 specific checks.
-    
-    Args:
-        fragment (str): Fragment content
-        dn (str): Dataset name
-        pi (str): Prepid
-        
-    Returns:
-        list: List of error messages
-    """
     err = []
     fragment = fragment.replace(" ","")
     run3_checks_exception_list = [
@@ -621,11 +472,6 @@ print("Current date and time: %s" % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'
 print("Prepid(s):")
 for x in prepid:
     print(x)
-
-
-# ============================================================================
-# MAIN PROCESSING LOOP
-# ============================================================================
 
 for num in range(0,len(prepid)):
     res = get_request(prepid[num])
